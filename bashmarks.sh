@@ -1,21 +1,20 @@
 # fork of bashmarks that has mac specific features	  
-# Bilal Syed Hussain 
-# based of https://github.com/huyng/bashmarks
+# based of https://github.com/Bilalh/bashmarks
 
 # USAGE: 
-# s <bookmark_name>  - Saves the current directory as "bookmark_name"
-# g <bookmark_name>  - Goes (cd) to the directory associated with "bookmark_name"
-# d <bookmark_name>  - Deletes the bookmark
-# l <bookmark_name>  - Lists the specified bookmark associated with "bookmark_name"
-# l                  - Lists all available bookmarks
-# s                  - Saves the default directory
-# g                  - Goes to the default directory
-# g -                - Goes to the previous directory
-# _p <bookmark_name> - Prints the directory associated with "bookmark_name"
+# save <bookmark_name>      - Saves the current directory as "bookmark_name"
+# go <bookmark_name>        - Goes (cd) to the directory associated with "bookmark_name"
+# delete <bookmark_name>    - Deletes the bookmark
+# bookmark <bookmark_name>  - Lists the specified bookmark associated with "bookmark_name"
+# bookmark                  - Lists all available bookmarks
+# save                      - Saves the default directory
+# go                        - Goes to the default directory
+# go -                      - Goes to the previous directory
+# _p <bookmark_name>        - Prints the directory associated with "bookmark_name"
 
 # Mac only 
-# o <bookmark_name>  - Open the directory associated with "bookmark_name" in Finder
-# y <bookmark_name>  - Open the directory associated with "bookmark_name" in a new tab
+# o <bookmark_name>    - Open the directory associated with "bookmark_name" in Finder
+# tab <bookmark_name>  - Open the directory associated with "bookmark_name" in a new tab
 
 # Tab completion for g o p and d 
 # setup file to store bookmarks
@@ -29,7 +28,7 @@ function __unset_dirs {
 }
 
 # save current directory to bookmarks
-function s {
+function save {
 	check_help $1
 	_bookmark_name_valid "$@"
 	if [ -z "$exit_message" ]; then
@@ -46,7 +45,7 @@ function s {
 }
 
 # jump to bookmark
-function g {
+function go {
 	check_help $1
 	source $SDIRS
 	if [ -z $1 ]; then
@@ -74,7 +73,7 @@ function _p {
 }
 
 # delete bookmark
-function d {
+function delete {
 	check_help $1
 	_bookmark_name_valid "$@"
 	if [ -z "$exit_message" ]; then
@@ -103,7 +102,7 @@ function o {
 }
 
 #jump to bookmark in a new tab in the current window
-function y {
+function tab {
 	check_help $1
 	source $SDIRS
 	if [ -z $1 ]; then
@@ -156,27 +155,23 @@ fi
 function check_help {
 	if [ "$1" = "-h" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ] ; then
 		echo ''
-		echo 's <bookmark_name>  - Saves the current directory as "bookmark_name"'
-		echo 'g <bookmark_name>  - Goes (cd) to the directory associated with "bookmark_name"'
+		echo 'save <bookmark_name>       - Saves the current directory as "bookmark_name"'
+		echo 'go <bookmark_name>         - Goes (cd) to the directory associated with "bookmark_name"'
 		if [ "`uname`" = "Darwin" ]; then
-		echo 'o <bookmark_name>  - Open the directory associated with "name" in Finder'
-		echo 'y <bookmark_name>  - Open the directory associated with "name" in a new tab'
+		echo 'o <bookmark_name>          - Open the directory associated with "name" in Finder'
+		echo 'tab <bookmark_name>        - Open the directory associated with "name" in a new tab'
 		fi
-		echo 'd <bookmark_name>  - Deletes the bookmark'
-		echo 's                  - Saves the default directory'
-		echo 'g                  - Goes to the default directory'
-		echo 'l                  - Lists all available bookmarks'
-		echo 'l <bookmark_name>  - Lists the bookmark associated with "bookmark_name"'
-		echo '_p <bookmark_name> - Prints the directory associated with "bookmark_name"'
-		if [ $BASHMARKS_k ]; then		
-		echo "k <bookmark_name>  - Tries use 'g', if the bookmark does not exist try autojump's j"
-		fi
-		kill -SIGINT $$
+		echo 'delete <bookmark_name>     - Deletes the bookmark'
+		echo 'save                       - Saves the default directory'
+		echo 'go                         - Goes to the default directory'
+		echo 'bookmarks                  - Lists all available bookmarks'
+		echo 'bookmarks <bookmark_name>  - Lists the bookmark associated with "bookmark_name"'
+		echo '_p <bookmark_name>         - Prints the directory associated with "bookmark_name"'
 	fi
 }
 
 # list bookmarks with dirnam
-alias l='_bookmarks'
+alias bookmarks='_bookmarks'
 function _bookmarks {
 	check_help $1
 	source $SDIRS
@@ -251,50 +246,16 @@ function _purge_line {
 # bind completion command for o g,p,d to _comp
 if [ $ZSH_VERSION ]; then
 	compctl -K _compzsh o
-	compctl -K _compzsh g
+	compctl -K _compzsh go
 	compctl -K _compzsh _p
-	compctl -K _compzsh d
-	compctl -K _compzsh y
+	compctl -K _compzsh delete
+	compctl -K _compzsh tab
 else
 	shopt -s progcomp
 	complete -F _comp o
-	complete -F _comp g
+	complete -F _comp go
 	complete -F _comp _p
-	complete -F _comp d
-	complete -F _comp y
-fi
-
-if [ $BASHMARKS_k ]; then
-	# Use a bookmark if it is available otherwise try to use autojump j's command 
-	function k {
-		check_help $1
-		
-		if [ -n "$1"  ]; then
-			if (grep DIR_$1 .sdirs &>/dev/null); then
-				g "$@"
-			else
-				j "$@"	
-			fi
-		else 
-			g "$@"
-		fi
-	}
-
-	if [ $ZSH_VERSION ]; then
-		function _compzsh_k {
-			cur=${words[2, -1]}
-			autojump --complete ${=cur[*]} | while read i
-			do
-				compadd -U "$i"
-			done
-
-			for f in `_l`; 
-			do
-				compadd  $f
-			done
-		}
-		compdef _compzsh_k k 
-	fi
-
+	complete -F _comp delete
+	complete -F _comp tab
 fi
 
