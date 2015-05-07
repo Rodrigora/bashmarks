@@ -17,7 +17,7 @@ Extra Features
 Install
 -------
 
-1. git clone git://github.com/Bilalh/bashmarks.git
+1. git clone this repo
 2. make install  (or just put bashmarks.sh in your $PATH and source `it`  )
 3. **source ~/.local/bin/bashmarks.sh** from within your **~.bash\_profile** or **~/.bashrc** file
 
@@ -27,8 +27,8 @@ Shell Commands
 # save <bookmark_name>      - Saves the current directory as "bookmark_name"
 # go <bookmark_name>        - Goes (cd) to the directory associated with "bookmark_name"
 # delete <bookmark_name>    - Deletes the bookmark
-# bookmark <bookmark_name>  - Lists the specified bookmark associated with "bookmark_name"
-# bookmark                  - Lists all available bookmarks
+# bookmarks <bookmark_name> - Lists the specified bookmark associated with "bookmark_name"
+# bookmarks                 - Lists all available bookmarks
 # save                      - Saves the default directory
 # go                        - Goes to the default directory
 # go -                      - Goes to the previous directory
